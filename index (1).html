@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Areex Cloud – Premium Minecraft Hosting</title>
+<link rel="icon" type="image/png" href="logo.png"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet"/>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#05080F;--bg2:#080C18;--card:#0D1422;--card2:#111A2E;
+  --blue:#00BFFF;--cyan:#00FFFF;--green:#00FF88;--purple:#6C2FD9;
+  --pink:#FF2D78;--gold:#FFD700;
+  --text:#F0F4FF;--muted:#5A7099;--border:#1A2540;
+  --glow-blue:0 0 20px rgba(0,191,255,0.5);
+  --glow-cyan:0 0 30px rgba(0,255,255,0.4);
+  --glow-green:0 0 20px rgba(0,255,136,0.4);
+}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:'Space Grotesk',sans-serif;
+  overflow-x:hidden;cursor:default;
+}
+
+/* ── ANTI-INSPECT ── */
+body{-webkit-user-select:none;-moz-user-select:none;user-select:none}
+
+/* ── GLOBAL SCROLLBAR ── */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--blue);border-radius:3px}
+
+/* ── NOISE OVERLAY ── */
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  opacity:0.4;
+}
+
+/* ── CANVAS ── */
+#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0.6}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 5%;height:72px;
+  background:rgba(5,8,15,0.8);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(0,191,255,0.15);
+  transition:all .3s;
+}
+nav.scrolled{background:rgba(5,8,15,0.95);box-shadow:0 4px 30px rgba(0,191,255,0.1)}
+
+.nav-logo{display:flex;align-items:center;gap:.75rem;text-decoration:none}
+.nav-logo img{width:38px;height:38px;object-fit:contain;filter:drop-shadow(0 0 8px rgba(0,191,255,0.6))}
+.nav-logo-text{
+  font-family:'Orbitron',sans-serif;font-weight:900;font-size:1.1rem;
+  background:linear-gradient(90deg,#fff,var(--cyan));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  letter-spacing:3px;
+}
+
+.nav-links{display:flex;gap:2rem;list-style:none}
+.nav-links a{
+  color:var(--muted);text-decoration:none;font-size:.875rem;font-weight:500;
+  transition:color .2s;position:relative;
+}
+.nav-links a::after{
+  content:'';position:absolute;bottom:-4px;left:0;right:0;
+  height:1px;background:var(--cyan);transform:scaleX(0);
+  transition:transform .3s;transform-origin:left;
+}
+.nav-links a:hover{color:var(--cyan)}
+.nav-links a:hover::after{transform:scaleX(1)}
+
+.nav-right{display:flex;align-items:center;gap:1rem}
+.nav-cta{
+  background:linear-gradient(135deg,var(--blue),var(--purple));
+  color:#fff;border:none;padding:.55rem 1.5rem;border-radius:8px;
+  font-weight:700;font-size:.875rem;cursor:pointer;text-decoration:none;
+  transition:all .3s;box-shadow:0 0 20px rgba(0,191,255,0.3);
+  font-family:'Space Grotesk',sans-serif;
+}
+.nav-cta:hover{box-shadow:0 0 35px rgba(0,191,255,0.6);transform:translateY(-1px)}
+.hamburger{display:none;background:none;border:none;cursor:pointer;flex-direction:column;gap:5px}
+.hamburger span{display:block;width:24px;height:2px;background:var(--text);transition:all .3s;border-radius:2px}
+
+/* ── HERO ── */
+#hero{
+  position:relative;min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:90px 5% 60px;overflow:hidden;
+}
+
+/* Animated grid floor */
+#hero::before{
+  content:'';position:absolute;inset:0;z-index:1;
+  background:
+    linear-gradient(rgba(0,191,255,0.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,191,255,0.03) 1px,transparent 1px);
+  background-size:60px 60px;
+  mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 40%,transparent 100%);
+  animation:gridPulse 4s ease-in-out infinite alternate;
+}
+@keyframes gridPulse{from{opacity:.4}to{opacity:.9}}
+
+/* Glowing orbs */
+.orb{
+  position:absolute;border-radius:50%;pointer-events:none;z-index:1;
+  filter:blur(60px);animation:orbFloat 8s ease-in-out infinite;
+}
+.orb1{width:400px;height:400px;background:rgba(0,191,255,0.12);top:-100px;left:-100px;animation-delay:0s}
+.orb2{width:300px;height:300px;background:rgba(108,47,217,0.15);bottom:-50px;right:-50px;animation-delay:-3s}
+.orb3{width:200px;height:200px;background:rgba(0,255,136,0.08);top:50%;left:70%;animation-delay:-6s}
+@keyframes orbFloat{
+  0%,100%{transform:translate(0,0) scale(1)}
+  33%{transform:translate(30px,-20px) scale(1.05)}
+  66%{transform:translate(-20px,15px) scale(0.95)}
+}
+
+.hero-content{position:relative;z-index:2}
+
+/* Floating logo */
+.hero-logo{
+  width:130px;height:130px;object-fit:contain;margin:0 auto 1.5rem;
+  display:block;
+  filter:drop-shadow(0 0 25px rgba(0,191,255,0.8)) drop-shadow(0 0 60px rgba(0,191,255,0.4));
+  animation:logoFloat 4s ease-in-out infinite,logoGlow 2s ease-in-out infinite alternate;
+}
+@keyframes logoFloat{
+  0%,100%{transform:translateY(0) rotate(0deg)}
+  50%{transform:translateY(-15px) rotate(1deg)}
+}
+@keyframes logoGlow{
+  from{filter:drop-shadow(0 0 20px rgba(0,191,255,0.6)) drop-shadow(0 0 50px rgba(0,191,255,0.3))}
+  to{filter:drop-shadow(0 0 40px rgba(0,255,255,0.9)) drop-shadow(0 0 80px rgba(0,255,255,0.5))}
+}
+
+.hero-badge{
+  display:inline-flex;align-items:center;gap:.5rem;
+  background:rgba(0,191,255,0.08);border:1px solid rgba(0,191,255,0.3);
+  color:var(--cyan);border-radius:50px;padding:.4rem 1.2rem;
+  font-size:.78rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  margin-bottom:1.5rem;
+  animation:badgePulse 2s ease-in-out infinite;
+}
+@keyframes badgePulse{
+  0%,100%{box-shadow:0 0 10px rgba(0,191,255,0.2)}
+  50%{box-shadow:0 0 25px rgba(0,191,255,0.5),inset 0 0 15px rgba(0,191,255,0.05)}
+}
+
+.hero-title{
+  font-family:'Orbitron',sans-serif;
+  font-size:clamp(2rem,6.5vw,5rem);
+  font-weight:900;line-height:1.05;
+  margin-bottom:1.5rem;
+  text-shadow:0 0 40px rgba(0,191,255,0.3);
+}
+.hero-title .line1{display:block;color:#fff}
+.hero-title .line2{
+  display:block;
+  background:linear-gradient(90deg,var(--cyan),var(--blue),var(--green));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  background-size:200% auto;
+  animation:textShine 3s linear infinite;
+}
+@keyframes textShine{
+  0%{background-position:0%}100%{background-position:200%}
+}
+
+.hero-sub{
+  font-size:clamp(1rem,2vw,1.2rem);color:var(--muted);
+  max-width:580px;margin:0 auto 2.5rem;line-height:1.9;font-weight:400;
+}
+
+.hero-btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-bottom:3.5rem}
+
+.btn-glow{
+  background:linear-gradient(135deg,var(--blue),var(--purple));
+  color:#fff;padding:.9rem 2.4rem;border-radius:12px;
+  font-weight:700;font-size:1rem;text-decoration:none;border:none;
+  cursor:pointer;position:relative;overflow:hidden;
+  box-shadow:0 0 30px rgba(0,191,255,0.4);
+  transition:all .3s;font-family:'Space Grotesk',sans-serif;
+}
+.btn-glow::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,0.15),transparent);
+  opacity:0;transition:opacity .3s;
+}
+.btn-glow:hover{transform:translateY(-3px);box-shadow:0 0 50px rgba(0,191,255,0.7)}
+.btn-glow:hover::before{opacity:1}
+
+.btn-outline{
+  background:transparent;color:var(--text);padding:.9rem 2.4rem;
+  border-radius:12px;font-weight:600;font-size:1rem;text-decoration:none;
+  border:1px solid rgba(0,191,255,0.3);cursor:pointer;
+  transition:all .3s;font-family:'Space Grotesk',sans-serif;
+}
+.btn-outline:hover{border-color:var(--cyan);color:var(--cyan);box-shadow:0 0 20px rgba(0,255,255,0.2)}
+
+/* Hero stats */
+.hero-stats{
+  display:flex;gap:0;
+  background:rgba(13,20,34,0.8);border:1px solid rgba(0,191,255,0.15);
+  border-radius:20px;overflow:hidden;backdrop-filter:blur(10px);
+  flex-wrap:wrap;justify-content:center;
+}
+.h-stat{
+  padding:1.25rem 2.5rem;text-align:center;position:relative;
+}
+.h-stat:not(:last-child)::after{
+  content:'';position:absolute;right:0;top:20%;bottom:20%;
+  width:1px;background:rgba(0,191,255,0.15);
+}
+.h-stat-num{
+  font-family:'Orbitron',sans-serif;font-size:1.8rem;font-weight:900;
+  color:var(--cyan);text-shadow:0 0 15px rgba(0,255,255,0.5);
+}
+.h-stat-label{font-size:.72rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:.3rem}
+
+/* ── MARQUEE STRIP ── */
+.marquee-strip{
+  background:linear-gradient(90deg,var(--blue),var(--purple),var(--blue));
+  padding:.6rem 0;overflow:hidden;position:relative;z-index:5;
+}
+.marquee-inner{
+  display:flex;gap:3rem;white-space:nowrap;
+  animation:marquee 20s linear infinite;
+  font-size:.8rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#fff;
+}
+.marquee-inner span{opacity:.9}
+.marquee-dot{opacity:.4}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ── SECTION COMMON ── */
+section{padding:7rem 5%;position:relative;z-index:5}
+.section-eye{
+  font-size:.72rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;
+  color:var(--cyan);margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem;
+}
+.section-eye::before,.section-eye::after{content:'';flex:1 0 30px;height:1px;background:rgba(0,191,255,0.2)}
+.section-title{
+  font-family:'Orbitron',sans-serif;
+  font-size:clamp(1.6rem,3.5vw,2.8rem);font-weight:900;
+  margin-bottom:1rem;text-align:center;
+}
+.section-sub{color:var(--muted);text-align:center;max-width:580px;margin:0 auto;line-height:1.9}
+
+/* ── FEATURES ── */
+#features{background:var(--bg2)}
+.feat-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));
+  gap:1.5rem;margin-top:4rem;
+}
+.feat-card{
+  background:var(--card);border:1px solid var(--border);border-radius:20px;
+  padding:2rem;position:relative;overflow:hidden;
+  transition:all .4s cubic-bezier(0.175,0.885,0.32,1.275);
+  cursor:default;
+}
+.feat-card::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 50% 0%,rgba(0,191,255,0.08),transparent 60%);
+  opacity:0;transition:opacity .4s;
+}
+.feat-card::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--cyan),transparent);
+  opacity:0;transition:opacity .4s;
+}
+.feat-card:hover{
+  transform:translateY(-8px);border-color:rgba(0,191,255,0.4);
+  box-shadow:0 20px 60px rgba(0,191,255,0.15),0 0 0 1px rgba(0,191,255,0.1);
+}
+.feat-card:hover::before,.feat-card:hover::after{opacity:1}
+
+.feat-icon-wrap{
+  width:56px;height:56px;border-radius:14px;
+  background:linear-gradient(135deg,rgba(0,191,255,0.15),rgba(108,47,217,0.15));
+  border:1px solid rgba(0,191,255,0.2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.6rem;margin-bottom:1.25rem;
+  transition:all .3s;
+}
+.feat-card:hover .feat-icon-wrap{
+  box-shadow:0 0 20px rgba(0,191,255,0.3);
+  background:linear-gradient(135deg,rgba(0,191,255,0.25),rgba(108,47,217,0.25));
+}
+.feat-title{font-weight:700;font-size:1.05rem;margin-bottom:.5rem}
+.feat-desc{color:var(--muted);font-size:.875rem;line-height:1.8}
+
+/* ── PLANS ── */
+#plans{background:var(--bg)}
+.plans-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:1.5rem;max-width:1200px;margin:4rem auto 0;
+}
+.plan-card{
+  background:var(--card);border:1px solid var(--border);border-radius:24px;
+  padding:2.25rem;display:flex;flex-direction:column;
+  position:relative;overflow:hidden;
+  transition:all .4s;
+}
+.plan-card::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 50% -20%,rgba(0,191,255,0.07),transparent 60%);
+  pointer-events:none;
+}
+.plan-card:hover{transform:translateY(-8px);box-shadow:0 30px 70px rgba(0,0,0,0.5)}
+.plan-card.popular{
+  border-color:var(--cyan);
+  background:linear-gradient(180deg,rgba(0,191,255,0.06),var(--card) 40%);
+  box-shadow:0 0 40px rgba(0,191,255,0.15),inset 0 1px 0 rgba(0,191,255,0.2);
+}
+.plan-card.popular::before{
+  background:radial-gradient(circle at 50% -10%,rgba(0,191,255,0.15),transparent 60%);
+}
+
+.popular-tag{
+  position:absolute;top:-1px;left:50%;transform:translateX(-50%);
+  background:linear-gradient(90deg,var(--blue),var(--cyan));
+  color:var(--bg);font-size:.68rem;font-weight:800;letter-spacing:2px;
+  text-transform:uppercase;padding:.35rem 1.5rem;border-radius:0 0 12px 12px;
+}
+
+.plan-tier{
+  font-size:.7rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;
+  color:var(--muted);margin-bottom:.75rem;
+}
+.plan-name{font-family:'Orbitron',sans-serif;font-weight:900;font-size:1.5rem;margin-bottom:.25rem}
+.plan-price-row{display:flex;align-items:flex-end;gap:.4rem;margin:.75rem 0 .25rem}
+.plan-price{font-family:'Orbitron',sans-serif;font-size:2.8rem;font-weight:900;line-height:1;color:var(--cyan)}
+.plan-period{color:var(--muted);font-size:.875rem;margin-bottom:.3rem}
+.plan-desc{color:var(--muted);font-size:.84rem;margin-bottom:1.75rem}
+
+.plan-feats{list-style:none;margin-bottom:2rem;flex:1}
+.plan-feats li{
+  display:flex;align-items:center;gap:.65rem;
+  font-size:.875rem;padding:.5rem 0;
+  border-bottom:1px solid var(--border);
+}
+.plan-feats li:last-child{border-bottom:none}
+.feat-check{color:var(--green);font-weight:700;font-size:.9rem;flex-shrink:0}
+
+.plan-btn{
+  background:linear-gradient(135deg,var(--blue),var(--purple));
+  color:#fff;border:none;padding:1rem;border-radius:12px;
+  font-weight:700;font-size:.95rem;cursor:pointer;
+  transition:all .3s;position:relative;overflow:hidden;
+  font-family:'Space Grotesk',sans-serif;width:100%;
+  box-shadow:0 4px 20px rgba(0,191,255,0.2);
+}
+.plan-btn:hover{box-shadow:0 4px 30px rgba(0,191,255,0.5);transform:translateY(-1px)}
+.plan-card.popular .plan-btn{
+  background:linear-gradient(135deg,var(--cyan),var(--blue));
+  color:var(--bg);box-shadow:0 4px 25px rgba(0,255,255,0.3);
+}
+
+/* ── HOW ── */
+#how{background:var(--bg2)}
+.how-wrap{
+  display:grid;grid-template-columns:1fr 1fr;gap:5rem;
+  align-items:center;max-width:1100px;margin:4rem auto 0;
+}
+.steps{display:flex;flex-direction:column;gap:0}
+.step{
+  display:flex;gap:1.5rem;padding:1.5rem 0;
+  border-bottom:1px solid var(--border);
+  transition:all .3s;
+}
+.step:last-child{border-bottom:none}
+.step:hover .step-num-wrap{box-shadow:0 0 25px rgba(0,191,255,0.4)}
+.step-num-wrap{
+  width:48px;height:48px;border-radius:14px;flex-shrink:0;
+  background:linear-gradient(135deg,rgba(0,191,255,0.15),rgba(108,47,217,0.15));
+  border:1px solid rgba(0,191,255,0.25);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Orbitron',sans-serif;font-weight:900;font-size:1.1rem;
+  color:var(--cyan);transition:all .3s;
+}
+.step-body h4{font-weight:700;margin-bottom:.35rem}
+.step-body p{color:var(--muted);font-size:.875rem;line-height:1.8}
+
+/* Terminal */
+.terminal{
+  background:#030508;border:1px solid rgba(0,191,255,0.2);
+  border-radius:20px;overflow:hidden;
+  box-shadow:0 0 60px rgba(0,191,255,0.1),inset 0 0 60px rgba(0,0,0,0.5);
+}
+.terminal-head{
+  background:rgba(13,20,34,0.9);padding:1rem 1.5rem;
+  display:flex;align-items:center;gap:1rem;
+  border-bottom:1px solid rgba(0,191,255,0.1);
+}
+.t-dots{display:flex;gap:.5rem}
+.t-dot{width:12px;height:12px;border-radius:50%}
+.t-dot-r{background:#FF5F57}.t-dot-y{background:#FEBC2E}.t-dot-g{background:#28C840}
+.t-title{color:var(--muted);font-size:.8rem;font-family:monospace;margin-left:auto}
+.terminal-body{padding:1.5rem;font-family:'Courier New',monospace;font-size:.82rem;line-height:2.2}
+.t-line{display:block}
+.t-prompt{color:var(--green)}
+.t-cmd{color:var(--cyan)}
+.t-out{color:#4A6080}
+.t-ok{color:var(--green)}
+.t-val{color:var(--gold)}
+.t-cursor{display:inline-block;width:8px;height:1em;background:var(--cyan);vertical-align:middle;animation:blink 1s step-end infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+/* ── TESTIMONIALS ── */
+#testimonials{background:var(--bg)}
+.testi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem;margin-top:4rem}
+.testi-card{
+  background:var(--card);border:1px solid var(--border);border-radius:20px;
+  padding:2rem;position:relative;overflow:hidden;transition:all .3s;
+}
+.testi-card:hover{border-color:rgba(0,191,255,0.3);transform:translateY(-4px)}
+.testi-card::before{
+  content:'❝';position:absolute;top:1rem;right:1.5rem;
+  font-size:3rem;color:rgba(0,191,255,0.08);font-family:Georgia,serif;line-height:1;
+}
+.stars{color:#FFD700;letter-spacing:2px;font-size:.9rem;margin-bottom:1rem}
+.testi-text{color:var(--muted);font-size:.9rem;line-height:1.9;margin-bottom:1.5rem;font-style:italic}
+.testi-author{display:flex;align-items:center;gap:.75rem}
+.testi-av{
+  width:42px;height:42px;border-radius:12px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--blue),var(--purple));
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:.95rem;color:#fff;
+}
+.testi-name{font-weight:700;font-size:.9rem}
+.testi-role{color:var(--muted);font-size:.78rem;margin-top:.1rem}
+
+/* ── FAQ ── */
+#faq{background:var(--bg2)}
+.faq-wrap{max-width:800px;margin:3rem auto 0}
+.faq-item{
+  border:1px solid var(--border);border-radius:14px;
+  margin-bottom:.75rem;overflow:hidden;transition:border-color .3s;
+}
+.faq-item:hover{border-color:rgba(0,191,255,0.25)}
+.faq-q{
+  width:100%;background:var(--card);color:var(--text);border:none;
+  padding:1.25rem 1.5rem;text-align:left;font-size:.95rem;font-weight:600;
+  cursor:pointer;display:flex;justify-content:space-between;align-items:center;
+  font-family:'Space Grotesk',sans-serif;
+}
+.faq-icon{
+  width:28px;height:28px;border-radius:8px;
+  background:rgba(0,191,255,0.1);border:1px solid rgba(0,191,255,0.2);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--cyan);font-size:1.1rem;transition:all .3s;flex-shrink:0;
+}
+.faq-q.open .faq-icon{background:var(--cyan);color:var(--bg);transform:rotate(45deg)}
+.faq-a{
+  background:var(--card);color:var(--muted);
+  padding:0 1.5rem;max-height:0;overflow:hidden;
+  transition:max-height .4s ease,padding .3s;font-size:.9rem;line-height:1.9;
+}
+.faq-a.open{max-height:200px;padding:0 1.5rem 1.25rem}
+
+/* ── CTA STRIP ── */
+#cta-strip{
+  position:relative;overflow:hidden;padding:6rem 5%;text-align:center;
+  background:linear-gradient(135deg,#050B1A,#0C0621);
+  border-top:1px solid rgba(0,191,255,0.1);border-bottom:1px solid rgba(0,191,255,0.1);
+}
+#cta-strip::before{
+  content:'';position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  width:600px;height:300px;border-radius:50%;
+  background:radial-gradient(ellipse,rgba(0,191,255,0.08),transparent 70%);
+}
+#cta-strip h2{
+  font-family:'Orbitron',sans-serif;font-size:clamp(1.6rem,3vw,2.8rem);
+  font-weight:900;margin-bottom:1rem;position:relative;z-index:1;
+}
+#cta-strip p{color:var(--muted);max-width:500px;margin:0 auto 2.5rem;line-height:1.9;position:relative;z-index:1}
+
+/* ── FOOTER ── */
+footer{background:#030508;padding:5rem 5% 2.5rem;border-top:1px solid var(--border)}
+.footer-top{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:3rem;margin-bottom:3.5rem}
+.footer-brand img{width:56px;height:56px;object-fit:contain;filter:drop-shadow(0 0 10px rgba(0,191,255,0.4))}
+.footer-brand p{color:var(--muted);font-size:.875rem;margin-top:1rem;line-height:1.9;max-width:260px}
+.footer-col h5{font-weight:700;font-size:.9rem;margin-bottom:1.25rem;color:var(--text)}
+.footer-col a{display:block;color:var(--muted);text-decoration:none;font-size:.875rem;margin-bottom:.7rem;transition:color .2s}
+.footer-col a:hover{color:var(--cyan)}
+.footer-bottom{
+  border-top:1px solid var(--border);padding-top:1.5rem;
+  display:flex;justify-content:space-between;align-items:center;
+  color:var(--muted);font-size:.8rem;flex-wrap:wrap;gap:1rem;
+}
+.footer-logo-text{
+  font-family:'Orbitron',sans-serif;font-weight:900;font-size:.9rem;
+  background:linear-gradient(90deg,var(--cyan),var(--blue));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+
+/* ── PAYMENT MODAL ── */
+.overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.85);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  z-index:500;display:flex;align-items:center;justify-content:center;padding:1rem;
+  opacity:0;pointer-events:none;transition:opacity .3s;
+}
+.overlay.show{opacity:1;pointer-events:all}
+.modal{
+  background:var(--card2);border:1px solid rgba(0,191,255,0.2);
+  border-radius:24px;padding:2.5rem;width:100%;max-width:480px;
+  transform:scale(.95) translateY(20px);transition:transform .3s;
+  position:relative;overflow:hidden;
+}
+.modal::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--cyan),transparent);
+}
+.overlay.show .modal{transform:scale(1) translateY(0)}
+.modal-title{
+  font-family:'Orbitron',sans-serif;font-weight:800;font-size:1.2rem;
+  margin-bottom:.4rem;
+}
+.modal-sub{color:var(--muted);font-size:.875rem;margin-bottom:1.75rem}
+
+.plan-pill{
+  background:rgba(0,191,255,0.08);border:1px solid rgba(0,191,255,0.2);
+  border-radius:12px;padding:1rem 1.25rem;margin-bottom:1.5rem;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.pill-name{font-weight:700;color:var(--cyan)}
+.pill-price{font-family:'Orbitron',sans-serif;font-weight:900;font-size:1.4rem}
+.pill-final{font-family:'Orbitron',sans-serif;font-weight:900;font-size:1.4rem;color:var(--green)}
+.pill-old{font-family:'Orbitron',sans-serif;font-size:.9rem;color:var(--muted);text-decoration:line-through}
+
+.form-g{margin-bottom:1rem}
+.form-g label{display:block;font-size:.8rem;font-weight:600;color:var(--muted);margin-bottom:.4rem;letter-spacing:.5px}
+.form-g input{
+  width:100%;background:rgba(255,255,255,0.04);
+  border:1px solid var(--border);color:var(--text);
+  padding:.75rem 1rem;border-radius:10px;
+  font-size:.9rem;font-family:'Space Grotesk',sans-serif;
+  transition:border-color .2s;
+}
+.form-g input:focus{outline:none;border-color:var(--cyan);box-shadow:0 0 0 3px rgba(0,191,255,0.1)}
+
+/* Coupon row */
+.coupon-row{display:flex;gap:.75rem;margin-bottom:1.25rem}
+.coupon-row input{flex:1}
+.coupon-apply{
+  background:rgba(0,191,255,0.1);border:1px solid rgba(0,191,255,0.3);
+  color:var(--cyan);padding:.75rem 1.25rem;border-radius:10px;
+  font-weight:700;font-size:.875rem;cursor:pointer;white-space:nowrap;
+  font-family:'Space Grotesk',sans-serif;transition:all .2s;
+}
+.coupon-apply:hover{background:rgba(0,191,255,0.2);box-shadow:0 0 15px rgba(0,191,255,0.2)}
+.coupon-msg{font-size:.8rem;margin-bottom:1rem;min-height:1.2em}
+.coupon-ok{color:var(--green)}
+.coupon-err{color:#EF4444}
+
+.modal-btns{display:flex;gap:.75rem;margin-top:1.5rem}
+.btn-pay{flex:1;background:linear-gradient(135deg,var(--blue),var(--purple));color:#fff;border:none;padding:.9rem;border-radius:12px;font-weight:700;font-size:.95rem;cursor:pointer;font-family:'Space Grotesk',sans-serif;transition:all .3s;box-shadow:0 0 20px rgba(0,191,255,0.3)}
+.btn-pay:hover{box-shadow:0 0 35px rgba(0,191,255,0.6);transform:translateY(-1px)}
+.btn-close-modal{background:transparent;border:1px solid var(--border);color:var(--muted);padding:.9rem 1.5rem;border-radius:12px;cursor:pointer;font-family:'Space Grotesk',sans-serif}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:2rem;right:2rem;z-index:9999;
+  background:var(--card2);border:1px solid var(--green);
+  color:var(--text);padding:1rem 1.5rem;border-radius:14px;
+  font-weight:600;font-size:.875rem;
+  transform:translateY(80px);opacity:0;transition:all .4s;pointer-events:none;
+  box-shadow:0 10px 40px rgba(0,0,0,0.4);
+}
+.toast.show{transform:translateY(0);opacity:1}
+
+/* ── SCROLL ANIMATIONS ── */
+.reveal{opacity:0;transform:translateY(30px);transition:all .7s cubic-bezier(0.16,1,0.3,1)}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-delay-1{transition-delay:.1s}
+.reveal-delay-2{transition-delay:.2s}
+.reveal-delay-3{transition-delay:.3s}
+
+/* ── MOBILE ── */
+@media(max-width:900px){
+  .how-wrap{grid-template-columns:1fr}
+  .footer-top{grid-template-columns:1fr 1fr}
+}
+@media(max-width:680px){
+  .nav-links{display:none}
+  .hamburger{display:flex}
+  .nav-links.open{
+    display:flex;flex-direction:column;position:fixed;
+    top:72px;left:0;right:0;background:rgba(5,8,15,0.97);
+    padding:2rem;border-bottom:1px solid var(--border);gap:1.5rem;
+    backdrop-filter:blur(20px);
+  }
+  .nav-links.open a{font-size:1rem;color:var(--text)}
+  .footer-top{grid-template-columns:1fr}
+  .h-stat{padding:1rem 1.5rem}
+  .hero-stats{border-radius:16px}
+}
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<!-- NAV -->
+<nav id="navbar">
+  <a href="#" class="nav-logo">
+    <img src="logo.png" alt="Areex Cloud Logo"/>
+    <span class="nav-logo-text">AREEX CLOUD</span>
+  </a>
+  <ul class="nav-links" id="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#plans">Plans</a></li>
+    <li><a href="#how">How It Works</a></li>
+    <li><a href="#faq">FAQ</a></li>
+    <li><a href="admin.html" style="color:var(--cyan)">Admin</a></li>
+  </ul>
+  <div class="nav-right">
+    <a href="#plans" class="nav-cta">Get Started →</a>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+  <div class="hero-content">
+    <img src="logo.png" alt="Areex Cloud" class="hero-logo"/>
+    <div class="hero-badge">⚡ India's Most Powerful Minecraft Hosting</div>
+    <h1 class="hero-title">
+      <span class="line1">Your World.</span>
+      <span class="line2">No Limits.</span>
+    </h1>
+    <p class="hero-sub">Areex Cloud delivers blazing-fast, lag-free Minecraft servers backed by NVMe SSDs, enterprise DDoS protection, and 99.9% uptime — so you can focus on playing.</p>
+    <div class="hero-btns">
+      <a href="#plans" class="btn-glow">🚀 Launch Your Server</a>
+      <a href="#features" class="btn-outline">Explore Features</a>
+    </div>
+    <div class="hero-stats">
+      <div class="h-stat"><div class="h-stat-num">99.9%</div><div class="h-stat-label">Uptime SLA</div></div>
+      <div class="h-stat"><div class="h-stat-num">&lt;20ms</div><div class="h-stat-label">Latency</div></div>
+      <div class="h-stat"><div class="h-stat-num">500+</div><div class="h-stat-label">Players</div></div>
+      <div class="h-stat"><div class="h-stat-num">24/7</div><div class="h-stat-label">Support</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-strip">
+  <div class="marquee-inner" id="marquee">
+    <span>⚡ NVMe SSD Storage</span><span class="marquee-dot">✦</span>
+    <span>🛡️ Free DDoS Protection</span><span class="marquee-dot">✦</span>
+    <span>🚀 60-Second Setup</span><span class="marquee-dot">✦</span>
+    <span>🎮 One-Click Modpacks</span><span class="marquee-dot">✦</span>
+    <span>💾 Auto Backups</span><span class="marquee-dot">✦</span>
+    <span>📊 Pterodactyl Panel</span><span class="marquee-dot">✦</span>
+    <span>🌍 India Nodes</span><span class="marquee-dot">✦</span>
+    <span>💬 24/7 Support</span><span class="marquee-dot">✦</span>
+    <!-- Duplicate for seamless loop -->
+    <span>⚡ NVMe SSD Storage</span><span class="marquee-dot">✦</span>
+    <span>🛡️ Free DDoS Protection</span><span class="marquee-dot">✦</span>
+    <span>🚀 60-Second Setup</span><span class="marquee-dot">✦</span>
+    <span>🎮 One-Click Modpacks</span><span class="marquee-dot">✦</span>
+    <span>💾 Auto Backups</span><span class="marquee-dot">✦</span>
+    <span>📊 Pterodactyl Panel</span><span class="marquee-dot">✦</span>
+    <span>🌍 India Nodes</span><span class="marquee-dot">✦</span>
+    <span>💬 24/7 Support</span><span class="marquee-dot">✦</span>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="section-eye">Why Areex Cloud</div>
+  <h2 class="section-title">Everything Your Server Needs</h2>
+  <p class="section-sub">Enterprise-grade infrastructure, built specifically for the Minecraft community.</p>
+  <div class="feat-grid">
+    <div class="feat-card reveal"><div class="feat-icon-wrap">⚡</div><div class="feat-title">NVMe SSD Storage</div><p class="feat-desc">Ultra-fast solid-state drives that load your world in milliseconds, even with heavy mods and 50+ players online.</p></div>
+    <div class="feat-card reveal reveal-delay-1"><div class="feat-icon-wrap">🛡️</div><div class="feat-title">Enterprise DDoS Shield</div><p class="feat-desc">Multi-layered protection filters malicious traffic at the network edge, keeping your server online 24/7 no matter what.</p></div>
+    <div class="feat-card reveal reveal-delay-2"><div class="feat-icon-wrap">🚀</div><div class="feat-title">60-Second Deployment</div><p class="feat-desc">Pick a version, choose a modpack, and your server is live in under a minute. No technical knowledge required.</p></div>
+    <div class="feat-card reveal"><div class="feat-icon-wrap">🎮</div><div class="feat-title">One-Click Modpacks</div><p class="feat-desc">SkyFactory, RLCraft, ATM9, Pixelmon — install any popular modpack with a single click directly from your control panel.</p></div>
+    <div class="feat-card reveal reveal-delay-1"><div class="feat-icon-wrap">💾</div><div class="feat-title">Automatic Backups</div><p class="feat-desc">Daily automated backups stored securely off-site. Restore your entire world to any point with one click — never lose progress.</p></div>
+    <div class="feat-card reveal reveal-delay-2"><div class="feat-icon-wrap">📊</div><div class="feat-title">Pterodactyl Panel</div><p class="feat-desc">The industry's most powerful game server control panel. Manage console, files, databases, schedules, and subusers easily.</p></div>
+    <div class="feat-card reveal"><div class="feat-icon-wrap">🌍</div><div class="feat-title">India-First Nodes</div><p class="feat-desc">Servers physically located in Mumbai & Bangalore for the lowest possible ping across all Indian regions and neighbors.</p></div>
+    <div class="feat-card reveal reveal-delay-1"><div class="feat-icon-wrap">🔄</div><div class="feat-title">Free Migration</div><p class="feat-desc">Moving from another host? Our team migrates your entire server — worlds, plugins, configs — for free with zero downtime.</p></div>
+    <div class="feat-card reveal reveal-delay-2"><div class="feat-icon-wrap">💬</div><div class="feat-title">Real Human Support</div><p class="feat-desc">Minecraft-specialist support agents on Discord and tickets. Average response under 10 minutes, every single day.</p></div>
+  </div>
+</section>
+
+<!-- PLANS -->
+<section id="plans">
+  <div class="section-eye">Pricing</div>
+  <h2 class="section-title">Choose Your Power Level</h2>
+  <p class="section-sub">Transparent pricing. No contracts. Scale up or down any time.</p>
+  <div class="plans-grid" id="plans-grid"></div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="section-eye">Process</div>
+  <h2 class="section-title">Live in Under 60 Seconds</h2>
+  <div class="how-wrap">
+    <div class="steps">
+      <div class="step reveal">
+        <div class="step-num-wrap">01</div>
+        <div class="step-body"><h4>Pick a Plan</h4><p>Choose the plan that fits your community. Start small — upgrade any time with zero hassle.</p></div>
+      </div>
+      <div class="step reveal reveal-delay-1">
+        <div class="step-num-wrap">02</div>
+        <div class="step-body"><h4>Pay via Razorpay</h4><p>Secure checkout. UPI, cards, net banking, wallets — all accepted. Takes 10 seconds.</p></div>
+      </div>
+      <div class="step reveal reveal-delay-2">
+        <div class="step-num-wrap">03</div>
+        <div class="step-body"><h4>Server Spins Up</h4><p>Your Pterodactyl panel login lands in your inbox instantly. Your server is already running.</p></div>
+      </div>
+      <div class="step reveal reveal-delay-3">
+        <div class="step-num-wrap">04</div>
+        <div class="step-body"><h4>Play &amp; Build</h4><p>Share your IP, install plugins, invite friends. We handle uptime while you build your world.</p></div>
+      </div>
+    </div>
+    <div class="terminal reveal">
+      <div class="terminal-head">
+        <div class="t-dots">
+          <div class="t-dot t-dot-r"></div>
+          <div class="t-dot t-dot-y"></div>
+          <div class="t-dot t-dot-g"></div>
+        </div>
+        <span class="t-title">areex-deploy — bash</span>
+      </div>
+      <div class="terminal-body">
+        <span class="t-line"><span class="t-prompt">areex@cloud:~$</span> <span class="t-cmd">./launch-server.sh --plan iron</span></span>
+        <span class="t-line t-out">→ Allocating NVMe node [IN-MUM-02]...</span>
+        <span class="t-line t-out">→ Assigning 3GB DDR5 RAM...</span>
+        <span class="t-line t-out">→ Installing Java 21 runtime...</span>
+        <span class="t-line t-out">→ Loading Paper 1.21.1 jar...</span>
+        <span class="t-line t-out">→ Configuring Pterodactyl egg...</span>
+        <span class="t-line t-out">→ Activating DDoS shield...</span>
+        <span class="t-line t-out">→ Sending credentials to <span class="t-val">you@email.com</span>...</span>
+        <span class="t-line t-ok">✔ Server ONLINE — play.areexcloud.site</span>
+        <span class="t-line t-out">→ Total time: <span class="t-val">47 seconds</span></span>
+        <span class="t-line"><span class="t-prompt">areex@cloud:~$</span> <span class="t-cursor"></span></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials">
+  <div class="section-eye">Community</div>
+  <h2 class="section-title">Players Love Areex Cloud</h2>
+  <div class="testi-grid">
+    <div class="testi-card reveal">
+      <div class="stars">★★★★★</div>
+      <p class="testi-text">"Zero lag even with 30 players and RLCraft loaded. Best Minecraft hosting I've tried in India. The setup genuinely took under a minute."</p>
+      <div class="testi-author"><div class="testi-av">RK</div><div><div class="testi-name">Rahul K.</div><div class="testi-role">Server Owner · RLCraft Network</div></div></div>
+    </div>
+    <div class="testi-card reveal reveal-delay-1">
+      <div class="stars">★★★★★</div>
+      <p class="testi-text">"Support team migrated my entire 6GB world in under an hour, completely free. The speed and professionalism blew me away."</p>
+      <div class="testi-author"><div class="testi-av">AS</div><div><div class="testi-name">Aryan S.</div><div class="testi-role">Server Owner · Survival SMP</div></div></div>
+    </div>
+    <div class="testi-card reveal reveal-delay-2">
+      <div class="stars">★★★★★</div>
+      <p class="testi-text">"The Pterodactyl panel is incredibly clean. Been running for 4 months with 100% uptime. I literally recommend Areex Cloud to everyone."</p>
+      <div class="testi-author"><div class="testi-av">PM</div><div><div class="testi-name">Priya M.</div><div class="testi-role">Server Owner · Creative Network</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+  <div class="section-eye">FAQ</div>
+  <h2 class="section-title">Got Questions?</h2>
+  <p class="section-sub">Everything you need to know. Still stuck? Hit us on Discord.</p>
+  <div class="faq-wrap">
+    <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">What Minecraft versions do you support?<span class="faq-icon">+</span></button><div class="faq-a">We support all versions from 1.8 to the latest 1.21.x — Vanilla, Spigot, Paper, Forge, Fabric, Bungeecord, Velocity, and all major modpacks.</div></div>
+    <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">How fast is setup after payment?<span class="faq-icon">+</span></button><div class="faq-a">Your server is live within 60 seconds of payment confirmation. Pterodactyl panel credentials arrive in your email immediately.</div></div>
+    <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Can I upgrade my plan?<span class="faq-icon">+</span></button><div class="faq-a">Yes! Upgrade any time from your dashboard. The upgrade is instant and your entire world stays intact — no data loss ever.</div></div>
+    <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">What payment methods work?<span class="faq-icon">+</span></button><div class="faq-a">UPI (GPay, PhonePe, Paytm), debit/credit cards, net banking, and all major wallets via Razorpay — fully secure and encrypted.</div></div>
+    <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Do you offer a refund?<span class="faq-icon">+</span></button><div class="faq-a">Yes — 48-hour money-back guarantee on your first order. Contact support within 48 hours and we'll refund in full, no questions.</div></div>
+    <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Where are your servers located?<span class="faq-icon">+</span></button><div class="faq-a">Primary nodes in Mumbai & Bangalore for ultra-low latency across India. International expansion is in progress.</div></div>
+  </div>
+</section>
+
+<!-- CTA STRIP -->
+<section id="cta-strip">
+  <h2>Ready to Build Something Epic?</h2>
+  <p>Join hundreds of players already running lag-free servers on Areex Cloud. Get online in 60 seconds.</p>
+  <a href="#plans" class="btn-glow">🚀 Launch Your Server Now</a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div class="footer-brand">
+      <img src="logo.png" alt="Areex Cloud"/>
+      <p>Premium Minecraft hosting built for the Indian gaming community. Fast, reliable, and built to scale.</p>
+    </div>
+    <div class="footer-col">
+      <h5>Product</h5>
+      <a href="#plans">Plans & Pricing</a>
+      <a href="#features">Features</a>
+      <a href="#how">How It Works</a>
+    </div>
+    <div class="footer-col">
+      <h5>Support</h5>
+      <a href="#">Discord Server</a>
+      <a href="#">Submit a Ticket</a>
+      <a href="#">Status Page</a>
+    </div>
+    <div class="footer-col">
+      <h5>Legal</h5>
+      <a href="#">Terms of Service</a>
+      <a href="#">Privacy Policy</a>
+      <a href="#">Refund Policy</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 <span class="footer-logo-text">AREEX CLOUD</span>. All rights reserved.</span>
+    <span>AreexCloud.site</span>
+  </div>
+</footer>
+
+<!-- PAYMENT MODAL -->
+<div class="overlay" id="pay-overlay">
+  <div class="modal">
+    <div class="modal-title">Complete Your Order</div>
+    <p class="modal-sub">You're 30 seconds away from your server going live!</p>
+    <div class="plan-pill">
+      <div>
+        <div class="pill-name" id="modal-plan-name">—</div>
+        <div style="color:var(--muted);font-size:.78rem;margin-top:.2rem">Monthly Plan</div>
+      </div>
+      <div style="text-align:right">
+        <div class="pill-old" id="modal-plan-old" style="display:none"></div>
+        <div class="pill-price" id="modal-plan-price">—</div>
+      </div>
+    </div>
+    <!-- Coupon -->
+    <div>
+      <div class="coupon-row">
+        <input type="text" id="coupon-input" placeholder="Coupon code (e.g. AREEX10)" style="text-transform:uppercase"/>
+        <button class="coupon-apply" onclick="applyCoupon()">Apply</button>
+      </div>
+      <div class="coupon-msg" id="coupon-msg"></div>
+    </div>
+    <div class="form-g"><label>Full Name</label><input type="text" id="buyer-name" placeholder="Your name"/></div>
+    <div class="form-g"><label>Email Address</label><input type="email" id="buyer-email" placeholder="you@example.com"/></div>
+    <div class="form-g"><label>Phone Number</label><input type="tel" id="buyer-phone" placeholder="+91 98765 43210"/></div>
+    <div class="modal-btns">
+      <button class="btn-close-modal" onclick="closeModal()">Cancel</button>
+      <button class="btn-pay" onclick="initiatePayment()">🔒 Pay Securely</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── ANTI-INSPECT / ANTI-COPY ──
+document.addEventListener('contextmenu',e=>e.preventDefault());
+document.addEventListener('keydown',e=>{
+  if(e.ctrlKey&&['u','s','a','c','i','j','p'].includes(e.key.toLowerCase()))e.preventDefault();
+  if(e.key==='F12')e.preventDefault();
+  if(e.ctrlKey&&e.shiftKey&&['I','J','C'].includes(e.key))e.preventDefault();
+});
+// DevTools detection
+(function(){
+  const t=setInterval(()=>{
+    const start=performance.now();
+    debugger;
+    if(performance.now()-start>100){
+      document.body.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#05080F;color:#00BFFF;font-family:monospace;font-size:1.2rem;text-align:center;">⛔ DevTools Detected<br><small style="color:#5A7099;margin-top:.5rem;display:block">Please close developer tools to continue.</small></div>';
+      clearInterval(t);
+    }
+  },1000);
+})();
+
+// ── PLANS DATA ──
+const PLANS_KEY='areex_plans';
+const COUPONS_KEY='areex_coupons';
+
+const defaultPlans=[
+  {id:'dirt',name:'Dirt',price:49,period:'/mo',desc:'Perfect for small friend groups',popular:false,features:['1 GB RAM','10 GB NVMe SSD','5 Players','Unlimited Bandwidth','Free DDoS Protection','Pterodactyl Panel','24/7 Support']},
+  {id:'iron',name:'Iron',price:99,period:'/mo',desc:'Most popular for growing communities',popular:true,features:['3 GB RAM','25 GB NVMe SSD','20 Players','Unlimited Bandwidth','Free DDoS Protection','Pterodactyl Panel','Auto Backups','One-Click Modpacks','24/7 Priority Support']},
+  {id:'diamond',name:'Diamond',price:199,period:'/mo',desc:'For large servers & heavy modpacks',popular:false,features:['6 GB RAM','50 GB NVMe SSD','50 Players','Unlimited Bandwidth','Free DDoS Protection','Pterodactyl Panel','Auto Backups','One-Click Modpacks','Free Migration','Custom Domain','24/7 VIP Support']},
+  {id:'netherite',name:'Netherite',price:399,period:'/mo',desc:'Maximum power, zero compromises',popular:false,features:['12 GB RAM','100 GB NVMe SSD','Unlimited Players','Unlimited Bandwidth','Free DDoS Protection','Pterodactyl Panel','Hourly Backups','One-Click Modpacks','Free Migration','Custom Domain','Dedicated IP','24/7 VIP Support']}
+];
+
+function getPlans(){try{const s=localStorage.getItem(PLANS_KEY);return s?JSON.parse(s):defaultPlans}catch{return defaultPlans}}
+function getCoupons(){try{const s=localStorage.getItem(COUPONS_KEY);return s?JSON.parse(s):[{code:'AREEX10',discount:10,type:'percent',active:true}]}catch{return[]}}
+
+function renderPlans(){
+  const plans=getPlans();
+  document.getElementById('plans-grid').innerHTML=plans.map(p=>`
+    <div class="plan-card ${p.popular?'popular':''} reveal">
+      ${p.popular?'<div class="popular-tag">⚡ Most Popular</div>':''}
+      <div class="plan-tier">Areex Cloud</div>
+      <div class="plan-name">${p.name}</div>
+      <div class="plan-price-row">
+        <div class="plan-price">₹${p.price}</div>
+        <div class="plan-period">${p.period}</div>
+      </div>
+      <div class="plan-desc">${p.desc}</div>
+      <ul class="plan-feats">
+        ${p.features.map(f=>`<li><span class="feat-check">✓</span>${f}</li>`).join('')}
+      </ul>
+      <button class="plan-btn" onclick="openModal('${p.id}')">Get ${p.name} Plan →</button>
+    </div>
+  `).join('');
+  initReveal();
+}
+
+// ── MODAL & PAYMENT ──
+let activePlan=null,appliedDiscount=0;
+
+function openModal(id){
+  const plans=getPlans();
+  activePlan=plans.find(p=>p.id===id);
+  if(!activePlan)return;
+  appliedDiscount=0;
+  document.getElementById('modal-plan-name').textContent=activePlan.name+' Plan';
+  document.getElementById('modal-plan-price').textContent='₹'+activePlan.price+activePlan.period;
+  document.getElementById('modal-plan-old').style.display='none';
+  document.getElementById('coupon-input').value='';
+  document.getElementById('coupon-msg').textContent='';
+  ['buyer-name','buyer-email','buyer-phone'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('pay-overlay').classList.add('show');
+}
+function closeModal(){document.getElementById('pay-overlay').classList.remove('show');activePlan=null;appliedDiscount=0}
+document.getElementById('pay-overlay').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal()});
+
+function applyCoupon(){
+  const code=document.getElementById('coupon-input').value.trim().toUpperCase();
+  const coupons=getCoupons();
+  const msg=document.getElementById('coupon-msg');
+  const found=coupons.find(c=>c.code===code&&c.active);
+  if(!found){msg.innerHTML='<span class="coupon-err">❌ Invalid or expired coupon code.</span>';appliedDiscount=0;resetPriceDisplay();return}
+  if(found.type==='percent'){
+    appliedDiscount=Math.round(activePlan.price*found.discount/100);
+    msg.innerHTML=`<span class="coupon-ok">✅ ${found.discount}% off applied! You save ₹${appliedDiscount}</span>`;
+  }else{
+    appliedDiscount=Math.min(found.discount,activePlan.price-1);
+    msg.innerHTML=`<span class="coupon-ok">✅ ₹${appliedDiscount} off applied!</span>`;
+  }
+  const oldEl=document.getElementById('modal-plan-old');
+  const newEl=document.getElementById('modal-plan-price');
+  oldEl.textContent='₹'+activePlan.price;
+  oldEl.style.display='block';
+  newEl.textContent='₹'+(activePlan.price-appliedDiscount)+activePlan.period;
+  newEl.style.color='var(--green)';
+}
+function resetPriceDisplay(){
+  document.getElementById('modal-plan-old').style.display='none';
+  const newEl=document.getElementById('modal-plan-price');
+  newEl.textContent='₹'+activePlan.price+activePlan.period;
+  newEl.style.color='';
+}
+
+const RAZORPAY_KEY='rzp_test_REPLACE_WITH_YOUR_KEY';
+
+function initiatePayment(){
+  const name=document.getElementById('buyer-name').value.trim();
+  const email=document.getElementById('buyer-email').value.trim();
+  const phone=document.getElementById('buyer-phone').value.trim();
+  if(!name||!email||!phone){showToast('⚠️ Please fill all fields');return}
+  const finalAmount=(activePlan.price-appliedDiscount)*100;
+  const rzp=new Razorpay({
+    key:RAZORPAY_KEY,amount:finalAmount,currency:'INR',
+    name:'Areex Cloud',description:activePlan.name+' Minecraft Hosting',
+    handler:r=>{closeModal();showToast('🎉 Payment successful! Check your email for server credentials.')},
+    prefill:{name,email,contact:phone},
+    notes:{plan:activePlan.id,coupon:document.getElementById('coupon-input').value||'none'},
+    theme:{color:'#00BFFF'},
+  });
+  rzp.on('payment.failed',()=>showToast('❌ Payment failed. Please try again.'));
+  rzp.open();
+}
+
+// ── FAQ ──
+function toggleFaq(btn){
+  const a=btn.nextElementSibling;
+  const open=a.classList.toggle('open');
+  btn.classList.toggle('open',open);
+  btn.querySelector('.faq-icon').textContent=open?'+':'+';
+}
+
+// ── TOAST ──
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3500);
+}
+
+// ── NAV ──
+document.getElementById('hamburger').addEventListener('click',()=>document.getElementById('nav-links').classList.toggle('open'));
+window.addEventListener('scroll',()=>document.getElementById('navbar').classList.toggle('scrolled',scrollY>50));
+
+// ── SCROLL REVEAL ──
+function initReveal(){
+  const els=document.querySelectorAll('.reveal:not(.visible)');
+  const io=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target)}});
+  },{threshold:.1});
+  els.forEach(el=>io.observe(el));
+}
+initReveal();
+
+// ── CANVAS PARTICLES ──
+(function(){
+  const c=document.getElementById('bg-canvas');
+  const ctx=c.getContext('2d');
+  let W,H,pts;
+  function resize(){W=c.width=innerWidth;H=c.height=innerHeight}
+  function init(){
+    pts=Array.from({length:60},()=>({
+      x:Math.random()*W,y:Math.random()*H,
+      vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,
+      r:Math.random()*1.2+.3,a:Math.random()*.5+.1
+    }));
+  }
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    for(let i=0;i<pts.length;i++){
+      const p=pts[i];
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.x<0)p.x=W;if(p.x>W)p.x=0;
+      if(p.y<0)p.y=H;if(p.y>H)p.y=0;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(0,191,255,${p.a})`;ctx.fill();
+      for(let j=i+1;j<pts.length;j++){
+        const q=pts[j],dx=p.x-q.x,dy=p.y-q.y,d=Math.hypot(dx,dy);
+        if(d<120){ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.strokeStyle=`rgba(0,191,255,${.06*(1-d/120)})`;ctx.lineWidth=.5;ctx.stroke()}
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  resize();init();draw();
+  window.addEventListener('resize',()=>{resize();init()});
+})();
+
+renderPlans();
+</script>
+</body>
+</html>
