@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Areex Cloud – Admin Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0A0E1A;--bg2:#0F1629;--card:#111827;--card2:#1a2236;
+  --blue:#00BFFF;--cyan:#00FFFF;--green:#00FF88;--purple:#6C2FD9;
+  --red:#EF4444;--yellow:#FBBF24;--orange:#F97316;
+  --text:#F0F4FF;--muted:#5A7099;--border:#1E293B;
+}
+body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-serif;min-height:100vh}
+
+/* LOGIN */
+#login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,#0F1629,#0A0E1A)}
+.login-box{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:2.5rem;width:100%;max-width:380px;text-align:center}
+.login-logo{font-family:'Orbitron',sans-serif;font-weight:900;font-size:1.3rem;background:linear-gradient(90deg,var(--blue),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:.4rem}
+.login-sub{color:var(--muted);font-size:.82rem;margin-bottom:2rem}
+.fg{margin-bottom:1.1rem;text-align:left}
+.fg label{display:block;font-size:.8rem;font-weight:600;margin-bottom:.4rem}
+.fg input{width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:.7rem .9rem;border-radius:9px;font-size:.875rem;font-family:'Space Grotesk',sans-serif}
+.fg input:focus{outline:none;border-color:var(--blue)}
+.btn-login{width:100%;background:linear-gradient(135deg,var(--blue),var(--purple));color:#fff;border:none;padding:.875rem;border-radius:10px;font-weight:700;font-size:.95rem;cursor:pointer;margin-top:.5rem;font-family:'Space Grotesk',sans-serif}
+.login-hint{color:var(--muted);font-size:.75rem;margin-top:1rem}
+
+/* LAYOUT */
+#admin-app{display:none}
+.layout{display:flex;min-height:100vh}
+.sidebar{width:230px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto}
+.sidebar-logo{font-family:'Orbitron',sans-serif;font-weight:900;font-size:1rem;background:linear-gradient(90deg,var(--blue),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;padding:1.4rem 1.4rem 1rem;border-bottom:1px solid var(--border)}
+.sidebar-label{font-size:.68rem;font-weight:700;color:var(--muted);letter-spacing:2px;text-transform:uppercase;padding:1.2rem 1.4rem .4rem}
+.nav-item{display:flex;align-items:center;gap:.7rem;padding:.7rem 1.4rem;color:var(--muted);cursor:pointer;border-radius:0;transition:color .2s,background .2s;font-size:.84rem;font-weight:500;border:none;background:none;width:100%;text-align:left;border-left:3px solid transparent}
+.nav-item:hover{color:var(--text);background:rgba(255,255,255,.03)}
+.nav-item.active{color:var(--blue);background:rgba(0,191,255,.07);border-left-color:var(--blue)}
+.sidebar-bottom{margin-top:auto;padding:1.25rem;border-top:1px solid var(--border)}
+.btn-logout{width:100%;background:transparent;border:1px solid var(--border);color:var(--muted);padding:.55rem;border-radius:8px;cursor:pointer;font-size:.84rem;font-family:'Space Grotesk',sans-serif}
+.btn-logout:hover{border-color:var(--red);color:var(--red)}
+
+.main{flex:1;padding:1.75rem;overflow-y:auto}
+.page{display:none}.page.active{display:block}
+.page-hdr{margin-bottom:1.75rem}
+.page-hdr h1{font-family:'Orbitron',sans-serif;font-size:1.4rem;font-weight:800}
+.page-hdr p{color:var(--muted);font-size:.84rem;margin-top:.35rem}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1.1rem;margin-bottom:1.75rem}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:1.25rem}
+.stat-card-icon{font-size:1.4rem;margin-bottom:.65rem}
+.stat-card-num{font-family:'Orbitron',sans-serif;font-size:1.6rem;font-weight:900;color:var(--blue)}
+.stat-card-label{color:var(--muted);font-size:.75rem;margin-top:.2rem}
+
+/* BOX */
+.box{background:var(--card);border:1px solid var(--border);border-radius:15px;padding:1.5rem;margin-bottom:1.25rem}
+.box-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;flex-wrap:wrap;gap:.75rem}
+.box-hdr h3{font-weight:700;font-size:.95rem}
+
+/* BUTTONS */
+.btn-sm{background:linear-gradient(135deg,var(--blue),var(--purple));color:#fff;border:none;padding:.45rem 1rem;border-radius:7px;font-size:.78rem;font-weight:700;cursor:pointer;font-family:'Space Grotesk',sans-serif;white-space:nowrap}
+.btn-sm-green{background:linear-gradient(135deg,#00c868,var(--green));color:#000;border:none;padding:.45rem 1rem;border-radius:7px;font-size:.78rem;font-weight:700;cursor:pointer;font-family:'Space Grotesk',sans-serif}
+.btn-sm-gold{background:linear-gradient(135deg,#c8a000,var(--yellow));color:#000;border:none;padding:.45rem 1rem;border-radius:7px;font-size:.78rem;font-weight:700;cursor:pointer;font-family:'Space Grotesk',sans-serif}
+.btn-sm-red{background:transparent;border:1px solid var(--red);color:var(--red);padding:.38rem .85rem;border-radius:7px;font-size:.75rem;cursor:pointer;font-family:'Space Grotesk',sans-serif}
+.btn-sm-yellow{background:transparent;border:1px solid var(--yellow);color:var(--yellow);padding:.38rem .85rem;border-radius:7px;font-size:.75rem;cursor:pointer;font-family:'Space Grotesk',sans-serif}
+.btn-full{background:linear-gradient(135deg,var(--blue),var(--purple));color:#fff;border:none;padding:.75rem 1.75rem;border-radius:10px;font-weight:700;cursor:pointer;font-size:.9rem;font-family:'Space Grotesk',sans-serif}
+.btn-cancel-f{background:transparent;border:1px solid var(--border);color:var(--muted);padding:.75rem 1.4rem;border-radius:10px;cursor:pointer;font-size:.875rem;font-family:'Space Grotesk',sans-serif}
+
+/* SECTION TABS */
+.section-tabs{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.5rem}
+.tab-btn{padding:.5rem 1.25rem;border-radius:50px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s;font-family:'Space Grotesk',sans-serif}
+.tab-btn:hover{border-color:var(--blue);color:var(--blue)}
+.tab-btn.active-tab{background:linear-gradient(135deg,var(--blue),var(--purple));border-color:transparent;color:#fff}
+.tab-btn.t-budget.active-tab{background:linear-gradient(135deg,#00c868,var(--green));color:#000;border-color:transparent}
+.tab-btn.t-premium.active-tab{background:linear-gradient(135deg,#c8a000,var(--yellow));color:#000;border-color:transparent}
+
+/* PLANS TABLE */
+.ptable{width:100%;border-collapse:collapse}
+.ptable th{text-align:left;font-size:.73rem;font-weight:700;text-transform:uppercase;color:var(--muted);letter-spacing:1px;padding:0 .9rem .65rem}
+.ptable td{padding:.875rem .9rem;border-top:1px solid var(--border);font-size:.84rem;vertical-align:middle}
+.ptable tr:hover td{background:rgba(255,255,255,.015)}
+.plan-type-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:.5rem}
+.dot-budget{background:var(--green)}.dot-premium{background:var(--yellow)}.dot-vps{background:var(--cyan)}
+.action-btns{display:flex;gap:.4rem;flex-wrap:wrap}
+.badge-active{background:rgba(0,255,136,.12);color:var(--green);padding:.2rem .55rem;border-radius:50px;font-size:.68rem;font-weight:700}
+.badge-popular{background:rgba(0,191,255,.12);color:var(--cyan);padding:.2rem .55rem;border-radius:50px;font-size:.68rem;font-weight:700}
+
+/* FORM */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.fga{display:flex;flex-direction:column;gap:.4rem}
+.fga label{font-size:.79rem;font-weight:600;color:var(--muted)}
+.fga input,.fga select,.fga textarea{background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:.65rem .875rem;border-radius:9px;font-size:.875rem;font-family:'Space Grotesk',sans-serif}
+.fga input:focus,.fga select:focus,.fga textarea:focus{outline:none;border-color:var(--blue)}
+.fga.full{grid-column:1/-1}
+.fga textarea{resize:vertical;min-height:90px}
+.form-actions{display:flex;gap:.75rem;margin-top:.875rem}
+.chk-row{display:flex;align-items:center;gap:.6rem;cursor:pointer;font-size:.875rem}
+.chk-row input[type=checkbox]{width:15px;height:15px}
+
+/* COUPON TABLE */
+.ctable{width:100%;border-collapse:collapse}
+.ctable th{text-align:left;font-size:.73rem;font-weight:700;text-transform:uppercase;color:var(--muted);letter-spacing:1px;padding:0 .9rem .65rem}
+.ctable td{padding:.875rem .9rem;border-top:1px solid var(--border);font-size:.84rem}
+.code-pill{background:rgba(0,191,255,.1);border:1px solid rgba(0,191,255,.25);color:var(--cyan);padding:.25rem .65rem;border-radius:6px;font-family:monospace;font-size:.85rem;font-weight:700}
+.toggle-on{background:rgba(0,255,136,.12);color:var(--green);border:1px solid rgba(0,255,136,.25);padding:.25rem .65rem;border-radius:50px;font-size:.73rem;font-weight:700;cursor:pointer;font-family:'Space Grotesk',sans-serif}
+.toggle-off{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.25);padding:.25rem .65rem;border-radius:50px;font-size:.73rem;font-weight:700;cursor:pointer;font-family:'Space Grotesk',sans-serif}
+
+/* PAYMENT PAGE */
+.info-box{background:rgba(0,191,255,.06);border:1px solid rgba(0,191,255,.2);border-radius:10px;padding:1rem 1.25rem;font-size:.84rem;color:var(--blue);margin-bottom:1.4rem}
+pre.code-block{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:.75rem 1rem;font-size:.78rem;color:var(--cyan);overflow-x:auto;margin:.65rem 0;font-family:'Courier New',monospace}
+
+/* TOAST */
+.toast{position:fixed;bottom:2rem;right:2rem;z-index:9999;background:var(--card2);border:1px solid var(--green);color:var(--text);padding:.9rem 1.4rem;border-radius:12px;font-weight:600;font-size:.85rem;transform:translateY(80px);opacity:0;transition:all .3s;pointer-events:none}
+.toast.show{transform:translateY(0);opacity:1}
+
+@media(max-width:700px){
+  .sidebar{display:none}
+  .form-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">AREEX✦CLOUD</div>
+    <p class="login-sub">Admin Panel — Authorized Access Only</p>
+    <div class="fg"><label>Username</label><input type="text" id="login-user" placeholder="admin"/></div>
+    <div class="fg"><label>Password</label><input type="password" id="login-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+    <button class="btn-login" onclick="doLogin()">Sign In →</button>
+    <p class="login-hint">Default: admin / areex2025 — change in Settings</p>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div id="admin-app">
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-logo">AREEX✦CLOUD</div>
+      <div class="sidebar-label">Menu</div>
+      <button class="nav-item active" onclick="showPage('dashboard',this)">📊 Dashboard</button>
+      <div class="sidebar-label">Plans</div>
+      <button class="nav-item" onclick="showPage('budget',this)">💚 Budget Plans</button>
+      <button class="nav-item" onclick="showPage('premium',this)">⚡ Premium Plans</button>
+      <button class="nav-item" onclick="showPage('vps',this)">🖥️ VPS Plans</button>
+      <div class="sidebar-label">Tools</div>
+      <button class="nav-item" onclick="showPage('coupons',this)">🎟️ Coupons</button>
+      <button class="nav-item" onclick="showPage('payment',this)">💳 Razorpay</button>
+      <button class="nav-item" onclick="showPage('settings',this)">⚙️ Settings</button>
+      <div class="sidebar-bottom">
+        <button class="btn-logout" onclick="doLogout()">↩ Sign Out</button>
+      </div>
+    </aside>
+
+    <main class="main">
+
+      <!-- DASHBOARD -->
+      <div class="page active" id="page-dashboard">
+        <div class="page-hdr"><h1>Dashboard</h1><p>Overview of Areex Cloud</p></div>
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-card-icon">💚</div><div class="stat-card-num" id="stat-budget">6</div><div class="stat-card-label">Budget Plans</div></div>
+          <div class="stat-card"><div class="stat-card-icon">⚡</div><div class="stat-card-num" id="stat-premium">6</div><div class="stat-card-label">Premium Plans</div></div>
+          <div class="stat-card"><div class="stat-card-icon">🖥️</div><div class="stat-card-num" id="stat-vps">7</div><div class="stat-card-label">VPS Plans</div></div>
+          <div class="stat-card"><div class="stat-card-icon">🎟️</div><div class="stat-card-num" id="stat-coupons">1</div><div class="stat-card-label">Coupons</div></div>
+        </div>
+        <div class="box">
+          <div class="box-hdr"><h3>Quick Actions</h3></div>
+          <div style="display:flex;gap:.75rem;flex-wrap:wrap">
+            <button class="btn-sm-green" onclick="showPage('budget',document.querySelector('[onclick*=budget]'))">+ Budget Plan</button>
+            <button class="btn-sm-gold" onclick="showPage('premium',document.querySelector('[onclick*=premium]'))">+ Premium Plan</button>
+            <button class="btn-sm" onclick="showPage('vps',document.querySelector('[onclick*=vps]'))">+ VPS Plan</button>
+            <button class="btn-sm" onclick="showPage('coupons',document.querySelector('[onclick*=coupons]'))">🎟 Manage Coupons</button>
+            <a href="index.html" target="_blank" class="btn-sm" style="text-decoration:none">↗ View Website</a>
+          </div>
+        </div>
+        <div class="box">
+          <div class="box-hdr"><h3>All Plans Overview</h3></div>
+          <table class="ptable"><thead><tr><th>Section</th><th>Plan Name</th><th>Price</th><th>Status</th></tr></thead>
+          <tbody id="dash-all-plans"></tbody></table>
+        </div>
+      </div>
+
+      <!-- BUDGET PLANS -->
+      <div class="page" id="page-budget">
+        <div class="page-hdr"><h1>💚 Budget Plans</h1><p>Manage affordable starter plans</p></div>
+        <div class="box" id="budget-list-box">
+          <div class="box-hdr"><h3>All Budget Plans</h3><button class="btn-sm-green" onclick="showPlanForm('budget')">+ New Budget Plan</button></div>
+          <table class="ptable"><thead><tr><th>Name</th><th>Price</th><th>Top Feature</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="budget-tbody"></tbody></table>
+        </div>
+        <div class="box" id="budget-form-box" style="display:none">
+          <div class="box-hdr"><h3 id="budget-form-title">New Budget Plan</h3><button class="btn-cancel-f" onclick="hidePlanForm('budget')">✕</button></div>
+          <div id="budget-form-content"></div>
+        </div>
+      </div>
+
+      <!-- PREMIUM PLANS -->
+      <div class="page" id="page-premium">
+        <div class="page-hdr"><h1>⚡ Premium Plans</h1><p>Manage high-performance plans</p></div>
+        <div class="box" id="premium-list-box">
+          <div class="box-hdr"><h3>All Premium Plans</h3><button class="btn-sm-gold" onclick="showPlanForm('premium')">+ New Premium Plan</button></div>
+          <table class="ptable"><thead><tr><th>Name</th><th>Price</th><th>Top Feature</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="premium-tbody"></tbody></table>
+        </div>
+        <div class="box" id="premium-form-box" style="display:none">
+          <div class="box-hdr"><h3 id="premium-form-title">New Premium Plan</h3><button class="btn-cancel-f" onclick="hidePlanForm('premium')">✕</button></div>
+          <div id="premium-form-content"></div>
+        </div>
+      </div>
+
+      <!-- VPS PLANS -->
+      <div class="page" id="page-vps">
+        <div class="page-hdr"><h1>🖥️ VPS Plans</h1><p>Manage virtual private server plans</p></div>
+        <div class="box" id="vps-list-box">
+          <div class="box-hdr"><h3>All VPS Plans</h3><button class="btn-sm" onclick="showPlanForm('vps')">+ New VPS Plan</button></div>
+          <table class="ptable"><thead><tr><th>Name</th><th>Price</th><th>Top Feature</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="vps-tbody"></tbody></table>
+        </div>
+        <div class="box" id="vps-form-box" style="display:none">
+          <div class="box-hdr"><h3 id="vps-form-title">New VPS Plan</h3><button class="btn-cancel-f" onclick="hidePlanForm('vps')">✕</button></div>
+          <div id="vps-form-content"></div>
+        </div>
+      </div>
+
+      <!-- COUPONS -->
+      <div class="page" id="page-coupons">
+        <div class="page-hdr"><h1>🎟️ Coupon Codes</h1><p>Create and manage discount coupons</p></div>
+        <div class="box">
+          <div class="box-hdr"><h3>Active Coupons</h3><button class="btn-sm" onclick="showCouponForm()">+ New Coupon</button></div>
+          <table class="ctable">
+            <thead><tr><th>Code</th><th>Discount</th><th>Type</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="coupons-tbody"></tbody>
+          </table>
+        </div>
+        <div class="box" id="coupon-form-box" style="display:none">
+          <div class="box-hdr"><h3 id="coupon-form-title">New Coupon</h3><button class="btn-cancel-f" onclick="hideCouponForm()">✕</button></div>
+          <div class="form-grid">
+            <div class="fga"><label>Coupon Code</label><input type="text" id="cf-code" placeholder="e.g. AREEX20" style="text-transform:uppercase"/></div>
+            <div class="fga"><label>Discount Type</label>
+              <select id="cf-type"><option value="percent">Percentage (%)</option><option value="flat">Flat Amount (₹)</option></select>
+            </div>
+            <div class="fga"><label>Discount Value</label><input type="number" id="cf-value" placeholder="10 (for 10% or ₹10)"/></div>
+            <div class="fga" style="justify-content:flex-end;padding-bottom:.1rem">
+              <label class="chk-row"><input type="checkbox" id="cf-active" checked/> Active</label>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="btn-full" onclick="saveCoupon()">Save Coupon</button>
+            <button class="btn-cancel-f" onclick="hideCouponForm()">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAYMENT -->
+      <div class="page" id="page-payment">
+        <div class="page-hdr"><h1>💳 Razorpay</h1><p>Configure your payment gateway</p></div>
+        <div class="box">
+          <div class="box-hdr"><h3>API Configuration</h3></div>
+          <div class="info-box">ℹ️ Get your keys from <strong>dashboard.razorpay.com → Settings → API Keys</strong>. Use Live keys for real payments.</div>
+          <div class="form-grid">
+            <div class="fga"><label>Key ID</label><input type="text" id="rzp-key-id" placeholder="rzp_live_XXXXXXXXXXXX"/></div>
+            <div class="fga"><label>Key Secret</label><input type="password" id="rzp-key-secret" placeholder="••••••••••••••••"/></div>
+            <div class="fga"><label>Mode</label><select id="rzp-mode"><option value="test">Test Mode</option><option value="live">Live Mode</option></select></div>
+            <div class="fga"><label>Business Name</label><input type="text" id="rzp-biz" value="Areex Cloud"/></div>
+          </div>
+          <div class="form-actions"><button class="btn-full" onclick="savePaymentConfig()">Save</button></div>
+        </div>
+        <div class="box">
+          <div class="box-hdr"><h3>How to Apply Your Key</h3></div>
+          <p style="color:var(--muted);font-size:.85rem;line-height:1.9">Open <strong style="color:var(--text)">index.html</strong> and find this line in the &lt;script&gt; section:</p>
+          <pre class="code-block">const RAZORPAY_KEY = 'rzp_test_REPLACE_WITH_YOUR_KEY';</pre>
+          <p style="color:var(--muted);font-size:.85rem;line-height:1.9">Replace the value with your actual Key ID from the form above, then save and re-upload <strong style="color:var(--text)">index.html</strong> to GitHub.</p>
+        </div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div class="page" id="page-settings">
+        <div class="page-hdr"><h1>⚙️ Settings</h1><p>Manage credentials and configuration</p></div>
+        <div class="box">
+          <div class="box-hdr"><h3>Change Admin Credentials</h3></div>
+          <div class="form-grid">
+            <div class="fga"><label>New Username</label><input type="text" id="new-user" placeholder="admin"/></div>
+            <div class="fga"><label>New Password</label><input type="password" id="new-pass" placeholder="New password"/></div>
+            <div class="fga"><label>Confirm Password</label><input type="password" id="confirm-pass" placeholder="Confirm"/></div>
+          </div>
+          <div class="form-actions"><button class="btn-full" onclick="changeCredentials()">Update Credentials</button></div>
+        </div>
+        <div class="box" style="border-color:rgba(239,68,68,.25)">
+          <div class="box-hdr"><h3 style="color:var(--red)">Danger Zone</h3></div>
+          <p style="color:var(--muted);font-size:.85rem;margin-bottom:1rem">Reset all plans back to the original defaults. Cannot be undone.</p>
+          <div style="display:flex;gap:.75rem;flex-wrap:wrap">
+            <button class="btn-sm-red" onclick="resetSection('budget')">Reset Budget Plans</button>
+            <button class="btn-sm-red" onclick="resetSection('premium')">Reset Premium Plans</button>
+            <button class="btn-sm-red" onclick="resetSection('vps')">Reset VPS Plans</button>
+            <button class="btn-sm-red" onclick="resetAll()">Reset Everything</button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ── AUTH ──
+const AUTH_KEY='areex_admin_auth';
+const CREDS_KEY='areex_admin_creds';
+const PLANS_KEY='areex_plans_v2';
+const COUPONS_KEY='areex_coupons';
+const PAYMENT_KEY='areex_payment';
+
+const defaultPlans={
+  budget:[
+    {id:'bp-pro',name:'Pro',price:125,period:'/mo',desc:'Great starter plan',popular:false,features:['6 GB RAM','250% CPU','1 Gbps Speed','65 GB Storage','Unlimited Databases','DDoS Protection','Pterodactyl Panel','24/7 Support']},
+    {id:'bp-max',name:'Max',price:149,period:'/mo',desc:'More power for your players',popular:true,features:['8 GB RAM','300% CPU','1 Gbps Speed','80 GB Storage','Unlimited Databases','DDoS Protection','Pterodactyl Panel','24/7 Support']},
+    {id:'bp-titan',name:'Titan',price:199,period:'/mo',desc:'For growing communities',popular:false,features:['12 GB RAM','350% CPU','1 Gbps Speed','90 GB Storage','Unlimited Databases','DDoS Protection','Auto Backups','24/7 Priority Support']},
+    {id:'bp-sudopodia',name:'Sudopodia',price:250,period:'/mo',desc:'Next level performance',popular:false,features:['16 GB RAM','450% CPU','1 Gbps Speed','100 GB Storage','Unlimited Databases','DDoS Protection','Auto Backups','24/7 Priority Support']},
+    {id:'bp-infinity',name:'Infinity',price:349,period:'/mo',desc:'Unlimited potential',popular:false,features:['24 GB RAM','600% CPU','1 Gbps Speed','150 GB Storage','Unlimited Databases','DDoS Protection','Auto Backups','Free Migration','24/7 VIP Support']},
+    {id:'bp-omega',name:'Omega',price:449,period:'/mo',desc:'The ultimate budget beast',popular:false,features:['32 GB RAM','800% CPU','1 Gbps Speed','200 GB Storage','Unlimited Databases','DDoS Protection','Hourly Backups','Free Migration','24/7 VIP Support']}
+  ],
+  premium:[
+    {id:'pp-elite',name:'Elite',price:399,period:'/mo',desc:'High performance gaming',popular:false,features:['24 GB RAM','700% CPU','2 Gbps Speed','350 GB Storage','Unlimited Databases','Advanced DDoS','Auto Backups','24/7 VIP Support']},
+    {id:'pp-eliteplus',name:'Elite Plus',price:499,period:'/mo',desc:'Maximum gaming power',popular:true,features:['32 GB RAM','800% CPU','5 Gbps Speed','500 GB Storage','Unlimited Databases','Advanced DDoS','Auto Backups','Free Migration','24/7 VIP Support']},
+    {id:'pp-enterprise',name:'Enterprise',price:649,period:'/mo',desc:'For serious server networks',popular:false,features:['48 GB RAM','1200% CPU','5 Gbps Speed','750 GB Storage','Unlimited Databases','Enterprise DDoS','Hourly Backups','Free Migration','Custom Domain','24/7 VIP Support']},
+    {id:'pp-enterprise-plus',name:'Enterprise Plus',price:799,period:'/mo',desc:'Top-tier network hosting',popular:false,features:['64 GB RAM','1600% CPU','5 Gbps Speed','1 TB Storage','Unlimited Databases','Enterprise DDoS','Hourly Backups','Free Migration','Custom Domain','Dedicated IP','24/7 VIP Support']},
+    {id:'pp-titan',name:'Titan',price:1299,period:'/mo',desc:'Unmatched raw power',popular:false,features:['128 GB RAM','3200% CPU','10 Gbps Speed','2 TB Storage','Unlimited Databases','Enterprise DDoS','Hourly Backups','Free Migration','Custom Domain','Dedicated IP','24/7 VIP Support']},
+    {id:'pp-titan-max',name:'Titan Max',price:2499,period:'/mo',desc:'The absolute pinnacle',popular:false,features:['256 GB RAM','6400% CPU','10 Gbps Speed','4 TB Storage','Unlimited Databases','Enterprise DDoS','Hourly Backups','Free Migration','Custom Domain','2× Dedicated IPs','Dedicated Account Manager']}
+  ],
+  vps:[
+    {id:'vps-starter',name:'Starter VPS',price:149,period:'/mo',desc:'Entry-level VPS',popular:false,features:['4 GB RAM','2 CPU Cores','50 GB Disk','Intel Xeon E5','Non-DDoS Protected','Full Root Access','KVM Virtualization','Instant Deploy']},
+    {id:'vps-micro',name:'Micro VPS',price:299,period:'/mo',desc:'Small projects',popular:false,features:['8 GB RAM','3 CPU Cores','100 GB Disk','Intel Xeon E5','Basic DDoS Protection','Full Root Access','KVM Virtualization','Instant Deploy']},
+    {id:'vps-macro',name:'Macro VPS',price:499,period:'/mo',desc:'Mid-range power',popular:true,features:['16 GB RAM','6 CPU Cores','200 GB Disk','Intel Xeon','Standard DDoS','Full Root Access','KVM Virtualization','Weekly Backups']},
+    {id:'vps-mega',name:'Mega VPS',price:749,period:'/mo',desc:'Demanding workloads',popular:false,features:['24 GB RAM','8 CPU Cores','300 GB Disk','Intel Xeon / AMD EPYC','Standard DDoS','Full Root Access','KVM Virtualization','Daily Backups']},
+    {id:'vps-large',name:'Large VPS',price:999,period:'/mo',desc:'High-performance',popular:false,features:['32 GB RAM','10 CPU Cores','400 GB Disk','AMD EPYC 7B13','Advanced DDoS','Full Root Access','KVM Virtualization','Daily Backups']},
+    {id:'vps-ultra',name:'Ultra VPS',price:1499,period:'/mo',desc:'Next-level raw performance',popular:false,features:['48 GB RAM','12 CPU Cores','600 GB Disk','AMD EPYC 7B13','Advanced DDoS','Full Root Access','KVM Virtualization','Daily Backups']},
+    {id:'vps-titan',name:'Titan VPS',price:1999,period:'/mo',desc:'Maximum VPS power',popular:false,features:['64 GB RAM','16 CPU Cores','800 GB Disk','AMD EPYC 7B13','Advanced DDoS','Full Root Access','KVM Virtualization','Hourly Backups']}
+  ]
+};
+
+const defaultCoupons=[{code:'AREEX10',discount:10,type:'percent',active:true}];
+
+function getCreds(){try{return JSON.parse(localStorage.getItem(CREDS_KEY))||{user:'admin',pass:'areex2025'}}catch{return{user:'admin',pass:'areex2025'}}}
+function getPlans(){try{const s=localStorage.getItem(PLANS_KEY);return s?JSON.parse(s):defaultPlans}catch{return defaultPlans}}
+function savePlans(p){localStorage.setItem(PLANS_KEY,JSON.stringify(p))}
+function getCoupons(){try{const s=localStorage.getItem(COUPONS_KEY);return s?JSON.parse(s):defaultCoupons}catch{return defaultCoupons}}
+function saveCoupons(c){localStorage.setItem(COUPONS_KEY,JSON.stringify(c))}
+
+function doLogin(){
+  const u=document.getElementById('login-user').value.trim();
+  const p=document.getElementById('login-pass').value;
+  const creds=getCreds();
+  if(u===creds.user&&p===creds.pass){
+    sessionStorage.setItem(AUTH_KEY,'1');
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('admin-app').style.display='block';
+    initAdmin();
+  }else showToast('❌ Invalid credentials');
+}
+function doLogout(){sessionStorage.removeItem(AUTH_KEY);location.reload()}
+if(sessionStorage.getItem(AUTH_KEY)==='1'){document.getElementById('login-screen').style.display='none';document.getElementById('admin-app').style.display='block';initAdmin()}
+
+// ── NAV ──
+function showPage(id,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  if(btn)btn.classList.add('active');
+  if(id==='budget')renderPlanTable('budget');
+  if(id==='premium')renderPlanTable('premium');
+  if(id==='vps')renderPlanTable('vps');
+  if(id==='coupons')renderCoupons();
+  if(id==='payment')loadPayment();
+  if(id==='dashboard')renderDashboard();
+}
+
+// ── DASHBOARD ──
+function renderDashboard(){
+  const plans=getPlans();
+  document.getElementById('stat-budget').textContent=plans.budget.length;
+  document.getElementById('stat-premium').textContent=plans.premium.length;
+  document.getElementById('stat-vps').textContent=plans.vps.length;
+  document.getElementById('stat-coupons').textContent=getCoupons().length;
+  const tbody=document.getElementById('dash-all-plans');
+  const rows=[];
+  plans.budget.forEach(p=>rows.push(`<tr><td><span class="plan-type-dot dot-budget"></span>Budget</td><td>${p.name}</td><td>₹${p.price}/mo</td><td><span class="badge-active">Active</span>${p.popular?'<span class="badge-popular" style="margin-left:.4rem">Popular</span>':''}</td></tr>`));
+  plans.premium.forEach(p=>rows.push(`<tr><td><span class="plan-type-dot dot-premium"></span>Premium</td><td>${p.name}</td><td>₹${p.price}/mo</td><td><span class="badge-active">Active</span>${p.popular?'<span class="badge-popular" style="margin-left:.4rem">Popular</span>':''}</td></tr>`));
+  plans.vps.forEach(p=>rows.push(`<tr><td><span class="plan-type-dot dot-vps"></span>VPS</td><td>${p.name}</td><td>₹${p.price}/mo</td><td><span class="badge-active">Active</span>${p.popular?'<span class="badge-popular" style="margin-left:.4rem">Popular</span>':''}</td></tr>`));
+  tbody.innerHTML=rows.join('');
+}
+
+// ── PLAN TABLE ──
+function renderPlanTable(type){
+  const plans=getPlans();
+  const list=plans[type]||[];
+  const tbody=document.getElementById(type+'-tbody');
+  tbody.innerHTML=list.map((p,i)=>`
+    <tr>
+      <td><strong>${p.name}</strong></td>
+      <td>₹${p.price}/mo</td>
+      <td style="color:var(--muted);font-size:.8rem">${p.features[0]||'—'}</td>
+      <td><span class="badge-active">Active</span>${p.popular?'<span class="badge-popular" style="margin-left:.4rem">Popular</span>':''}</td>
+      <td><div class="action-btns">
+        <button class="btn-sm-yellow" onclick="editPlan('${type}',${i})">Edit</button>
+        <button class="btn-sm-red" onclick="deletePlan('${type}',${i})">Delete</button>
+        <button class="btn-sm" onclick="movePlan('${type}',${i},-1)" title="Move up">↑</button>
+        <button class="btn-sm" onclick="movePlan('${type}',${i},1)" title="Move down">↓</button>
+      </div></td>
+    </tr>
+  `).join('');
+}
+
+let editingIdx={budget:-1,premium:-1,vps:-1};
+
+function planFormHTML(type,plan){
+  const v=plan||{};
+  return `<div class="form-grid">
+    <div class="fga"><label>Plan Name</label><input type="text" id="${type}-pf-name" placeholder="e.g. Ultra" value="${v.name||''}"/></div>
+    <div class="fga"><label>Price (₹/mo)</label><input type="number" id="${type}-pf-price" placeholder="299" value="${v.price||''}"/></div>
+    <div class="fga"><label>Short Description</label><input type="text" id="${type}-pf-desc" placeholder="Great for..." value="${v.desc||''}"/></div>
+    <div class="fga" style="justify-content:flex-end;padding-bottom:.1rem"><label class="chk-row"><input type="checkbox" id="${type}-pf-popular" ${v.popular?'checked':''}/> Mark as Most Popular</label></div>
+    <div class="fga full"><label>Features (one per line)</label><textarea id="${type}-pf-features" placeholder="8 GB RAM&#10;300% CPU&#10;1 Gbps Speed&#10;...">${(v.features||[]).join('\n')}</textarea></div>
+  </div>
+  <div class="form-actions">
+    <button class="btn-full" onclick="savePlan('${type}')">Save Plan</button>
+    <button class="btn-cancel-f" onclick="hidePlanForm('${type}')">Cancel</button>
+  </div>`;
+}
+
+function showPlanForm(type,plan,idx){
+  editingIdx[type]=idx!==undefined?idx:-1;
+  document.getElementById(type+'-form-title').textContent=editingIdx[type]>=0?'Edit Plan':'New Plan';
+  document.getElementById(type+'-form-content').innerHTML=planFormHTML(type,plan);
+  document.getElementById(type+'-form-box').style.display='block';
+  document.getElementById(type+'-form-box').scrollIntoView({behavior:'smooth'});
+}
+function hidePlanForm(type){document.getElementById(type+'-form-box').style.display='none';editingIdx[type]=-1}
+
+function editPlan(type,i){const plans=getPlans();showPlanForm(type,plans[type][i],i)}
+
+function deletePlan(type,i){
+  if(!confirm('Delete this plan?'))return;
+  const plans=getPlans();
+  plans[type].splice(i,1);savePlans(plans);renderPlanTable(type);renderDashboard();
+  showToast('🗑 Plan deleted');
+}
+
+function movePlan(type,i,dir){
+  const plans=getPlans();const list=plans[type];const j=i+dir;
+  if(j<0||j>=list.length)return;
+  [list[i],list[j]]=[list[j],list[i]];
+  savePlans(plans);renderPlanTable(type);showToast('↕ Plan reordered');
+}
+
+function savePlan(type){
+  const name=document.getElementById(type+'-pf-name').value.trim();
+  const price=parseInt(document.getElementById(type+'-pf-price').value);
+  const desc=document.getElementById(type+'-pf-desc').value.trim();
+  const featsRaw=document.getElementById(type+'-pf-features').value.trim();
+  const popular=document.getElementById(type+'-pf-popular').checked;
+  if(!name||!price||!desc){showToast('⚠️ Fill in name, price, and description');return}
+  const features=featsRaw.split('\n').map(f=>f.trim()).filter(Boolean);
+  const plan={id:type+'-'+name.toLowerCase().replace(/\s+/g,'-')+'-'+Date.now(),name,price,period:'/mo',desc,popular,features};
+  const plans=getPlans();
+  if(editingIdx[type]>=0){plans[type][editingIdx[type]]=plan}else{plans[type].push(plan)}
+  savePlans(plans);hidePlanForm(type);renderPlanTable(type);renderDashboard();
+  showToast('✅ Plan saved!');
+}
+
+// ── COUPONS ──
+let editingCouponIdx=-1;
+function renderCoupons(){
+  const coupons=getCoupons();
+  document.getElementById('stat-coupons').textContent=coupons.length;
+  document.getElementById('coupons-tbody').innerHTML=coupons.map((c,i)=>`
+    <tr>
+      <td><span class="code-pill">${c.code}</span></td>
+      <td><strong>${c.discount}${c.type==='percent'?'%':'₹'}</strong> off</td>
+      <td>${c.type==='percent'?'Percentage':'Flat Amount'}</td>
+      <td><button class="${c.active?'toggle-on':'toggle-off'}" onclick="toggleCoupon(${i})">${c.active?'Active':'Inactive'}</button></td>
+      <td><div class="action-btns">
+        <button class="btn-sm-yellow" onclick="editCoupon(${i})">Edit</button>
+        <button class="btn-sm-red" onclick="deleteCoupon(${i})">Delete</button>
+      </div></td>
+    </tr>
+  `).join('');
+}
+
+function showCouponForm(c,idx){
+  editingCouponIdx=idx!==undefined?idx:-1;
+  document.getElementById('coupon-form-title').textContent=editingCouponIdx>=0?'Edit Coupon':'New Coupon';
+  if(c){
+    document.getElementById('cf-code').value=c.code;
+    document.getElementById('cf-type').value=c.type;
+    document.getElementById('cf-value').value=c.discount;
+    document.getElementById('cf-active').checked=c.active;
+  }else{
+    document.getElementById('cf-code').value='';
+    document.getElementById('cf-type').value='percent';
+    document.getElementById('cf-value').value='';
+    document.getElementById('cf-active').checked=true;
+  }
+  document.getElementById('coupon-form-box').style.display='block';
+}
+function hideCouponForm(){document.getElementById('coupon-form-box').style.display='none';editingCouponIdx=-1}
+function editCoupon(i){const c=getCoupons()[i];showCouponForm(c,i)}
+function deleteCoupon(i){if(!confirm('Delete coupon?'))return;const c=getCoupons();c.splice(i,1);saveCoupons(c);renderCoupons();showToast('🗑 Coupon deleted')}
+function toggleCoupon(i){const c=getCoupons();c[i].active=!c[i].active;saveCoupons(c);renderCoupons();showToast(c[i].active?'✅ Coupon activated':'⏸ Coupon deactivated')}
+
+function saveCoupon(){
+  const code=document.getElementById('cf-code').value.trim().toUpperCase();
+  const type=document.getElementById('cf-type').value;
+  const discount=parseFloat(document.getElementById('cf-value').value);
+  const active=document.getElementById('cf-active').checked;
+  if(!code||!discount){showToast('⚠️ Fill in code and discount value');return}
+  const coupon={code,type,discount,active};
+  const coupons=getCoupons();
+  if(editingCouponIdx>=0){coupons[editingCouponIdx]=coupon}else{coupons.push(coupon)}
+  saveCoupons(coupons);hideCouponForm();renderCoupons();showToast('✅ Coupon saved!');
+}
+
+// ── PAYMENT ──
+function savePaymentConfig(){
+  const config={keyId:document.getElementById('rzp-key-id').value.trim(),keySecret:document.getElementById('rzp-key-secret').value.trim(),mode:document.getElementById('rzp-mode').value,biz:document.getElementById('rzp-biz').value.trim()};
+  localStorage.setItem(PAYMENT_KEY,JSON.stringify(config));
+  showToast('✅ Payment config saved! Apply the Key ID to index.html');
+}
+function loadPayment(){
+  try{const c=JSON.parse(localStorage.getItem(PAYMENT_KEY));if(!c)return;document.getElementById('rzp-key-id').value=c.keyId||'';document.getElementById('rzp-key-secret').value=c.keySecret||'';document.getElementById('rzp-mode').value=c.mode||'test';document.getElementById('rzp-biz').value=c.biz||'Areex Cloud'}catch{}}
+
+// ── SETTINGS ──
+function changeCredentials(){
+  const u=document.getElementById('new-user').value.trim();
+  const p=document.getElementById('new-pass').value;
+  const c=document.getElementById('confirm-pass').value;
+  if(!u||!p){showToast('⚠️ Fill all fields');return}
+  if(p!==c){showToast('❌ Passwords do not match');return}
+  localStorage.setItem(CREDS_KEY,JSON.stringify({user:u,pass:p}));
+  showToast('✅ Credentials updated!');
+}
+function resetSection(type){
+  if(!confirm('Reset '+type+' plans to defaults?'))return;
+  const plans=getPlans();plans[type]=defaultPlans[type];savePlans(plans);
+  showToast('🔄 '+type+' plans reset');renderDashboard();
+}
+function resetAll(){
+  if(!confirm('Reset ALL plans and coupons to defaults?'))return;
+  localStorage.removeItem(PLANS_KEY);localStorage.removeItem(COUPONS_KEY);
+  showToast('🔄 Everything reset to defaults');renderDashboard();
+}
+
+// ── TOAST ──
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500)}
+
+// ── INIT ──
+function initAdmin(){renderDashboard()}
+</script>
+</body>
+</html>
